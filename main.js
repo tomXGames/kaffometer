@@ -8,9 +8,9 @@ function initMap() {
   fetch('public-transport-ch.geojson').then(function(response) {
     response.json().then(function(result) {
       let locations = result.features.map((val) => {
+        var location, weight;
         if(val.geometry.type == "Point"){   //type is point
-          if(val.geometry.coordinates[0] == val.geometry.coordinates[1]) console.log(val)
-          return new google.maps.LatLng( parseFloat(val.geometry.coordinates[1]), parseFloat(val.geometry.coordinates[0]));
+          location = new google.maps.LatLng( parseFloat(val.geometry.coordinates[1]), parseFloat(val.geometry.coordinates[0]));
         }
         else if(val.geometry.type == "LineString"){  //type is polygon
           var x = 0, y= 0;
@@ -18,17 +18,10 @@ function initMap() {
             x += parseFloat(coords[0]);
             y += parseFloat(coords[1]);
           });
-          if(y/val.geometry.coordinates.length== x/val.geometry.coordinates.length) console.log(val);
-          return new google.maps.LatLng(y / val.geometry.coordinates.length, x/ val.geometry.coordinates.length );
+          location = new google.maps.LatLng(y / val.geometry.coordinates.length, x/ val.geometry.coordinates.length );
         }
-        else if(val.geometry.type == "Poylgon"){
-          var x = 0, y= 0;
-          val.geometry.coordinates[0].forEach(coords => {
-            x += parseFloat(coords[0]);
-            y += parseFloat(coords[1]);
-          });
-          if(y/val.geometry.coordinates.length== x/val.geometry.coordinates.length) console.log(val);
-          return new google.maps.LatLng(y / val.geometry.coordinates.length, x/ val.geometry.coordinates.length );
+        else if(val.geometry.type == "Polygon"){
+          location = new google.maps.LatLng(val.geometry.coordinates[0][0][0], val.geometry.coordinates[0][0][1]);
         }
         else if (val.geometry.type == "MultiPolygon"){  // Type is MultiPolygon
           var x=0, y=0;
@@ -41,18 +34,18 @@ function initMap() {
               })
             });
           });
-          if(y/length== x/length) console.log(val);
-          return new google.maps.LatLng(y/length, x/length);
+          location = new google.maps.LatLng(y/length, x/length);
         }
         else{
           console.error("Couldn't deserialize following object: ", val)
         }
+        return location;
       });
 
 
       heatmap = new google.maps.visualization.HeatmapLayer({
         data: locations,
-        maxI: 1000000,
+        opac: 1,
         
       });
 
