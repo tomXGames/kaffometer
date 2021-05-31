@@ -12,9 +12,18 @@ function initMap() {
           if(val.geometry.coordinates[0] == val.geometry.coordinates[1]) console.log(val)
           return new google.maps.LatLng( parseFloat(val.geometry.coordinates[1]), parseFloat(val.geometry.coordinates[0]));
         }
-        else if(val.geometry.type == "Polygon" || val.geometry.type == "LineString"){  //type is polygon
+        else if(val.geometry.type == "LineString"){  //type is polygon
           var x = 0, y= 0;
           val.geometry.coordinates.forEach(coords => {
+            x += parseFloat(coords[0]);
+            y += parseFloat(coords[1]);
+          });
+          if(y/val.geometry.coordinates.length== x/val.geometry.coordinates.length) console.log(val);
+          return new google.maps.LatLng(y / val.geometry.coordinates.length, x/ val.geometry.coordinates.length );
+        }
+        else if(val.geometry.type == "Poylgon"){
+          var x = 0, y= 0;
+          val.geometry.coordinates[0].forEach(coords => {
             x += parseFloat(coords[0]);
             y += parseFloat(coords[1]);
           });
